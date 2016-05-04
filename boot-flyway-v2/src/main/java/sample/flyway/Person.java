@@ -27,6 +27,7 @@ public class Person {
 	private Long id;
 	private String firstName;
 	private String lastName;
+	private String surname;
 
 	public String getFirstName() {
 		return this.firstName;
@@ -40,13 +41,21 @@ public class Person {
 		return this.lastName;
 	}
 
-	public void setLastName(String lastname) {
-		this.lastName = lastname;
+	public String getSurname() {
+		return surname;
+	}
+
+	/**
+	 * Storing both FIRST_NAME and SURNAME entries
+	 */
+	public void setSurname(String surname) {
+		this.lastName = surname;
+		this.surname = surname;
 	}
 
 	@Override
 	public String toString() {
-		return "Person [firstName=" + this.firstName + ", lastName=" + this.lastName
+		return "Person [firstName=" + this.firstName + ", lastName=" + this.lastName + ", surname=" + this.surname
 				+ "]";
 	}
 }

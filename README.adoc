@@ -11,7 +11,7 @@ while developing the app:
 - the database changes need to be backwards compatible
 - if you want to do a backwards incompatible change you have to do it in a couple of deployments
 - we don't want to do DB rollbacks. Not doing them simplifies the deployment process (some rollbacks are close to impossible like rolling back a delete)
-- we want to ALWAYS be able to rollback the application one version back (not more)
+- we want to *ALWAYS* be able to rollback the application one version back (not more)
 
 == The issue
 
@@ -25,7 +25,7 @@ WARNING: The following example is deliberately done in such a way that it will b
 
 === Changing the column name in backwards-incompatible way
 
-Let's assume that we have the DB in version `v1`. It has the column with a name `last_name`. We want to change it to `surname.` We have the app in version `1.0.0` which uses the `last_name` column in the code.
+Let's assume that we have the DB in version `v1`. It has the column with a name `last_name`. We want to change it to `surname`. We have the app in version `1.0.0` which uses the `last_name` column in the code.
 
 ==== Rolling a new backwards-incompatible version
 
@@ -34,15 +34,15 @@ Let's assume that we have the DB in version `v1`. It has the column with a name 
 
 ==== A/B testing
 
-The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second instance of the app that will be in version `2.0.0` and update the db to `v2`.
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second instance of the app that will be in version `2.0.0.BAD` and update the db to `v2bad`.
 
 Steps:
 
-. a new instance is deployed in version `2.0.0` that updates the db to `v2`
-. in `v2` of the database the column `last_name` is no longer existing - it got changed to `surname`
-. the db and app upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0`. All are talking to db in `v2`
+. a new instance is deployed in version `2.0.0.BAD` that updates the db to `v2bad`
+. in `v2bad` of the database the column `last_name` is no longer existing - it got changed to `surname`
+. the db and app upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0.BAD`. All are talking to db in `v2bad`
 . all instances of version `1.0.0` will start producing exceptions cause they will try to insert data to `last_name` column which is no longer there
-. all instances of version `2.0.0` will work without any issues
+. all instances of version `2.0.0.BAD` will work without any issues
 
 As you can if we do backwards incompatible changes of the DB and the application, A/B testing is impossible.
 
@@ -52,8 +52,8 @@ Let's assume that after trying to do A/B deployment we've decided that we need t
 
 Steps:
 
-. we shut down the instance that was running with version `2.0.0`
-. the database is still in `v2`
+. we shut down the instance that was running with version `2.0.0.BAD`
+. the database is still in `v2bad`
 . since version `1.0.0` doesn't understand what `surname` column is it will produce exceptions
 . hell broke loose and we can't go back
 
@@ -61,7 +61,7 @@ As you can if we do backwards incompatible changes of the DB and the application
 
 == Proper database update flow
 
-INFO: Here we'll present a more sound approach to deployment
+TIP: Here we'll present a more sound approach to deployment
 
 === Adding a new column
 
@@ -97,6 +97,49 @@ Steps:
 . roll back your app to version `1.0.0`.
 . version `1.0.0` is not using the database's column `surname` thus rollback should be successful
 
+=== Renaming a column
+
+This situation is more interesting. Let's assume that we have the DB in version `v1`. It contains the columns `first_name` and `last_name`. We want to change the `last_name` into `surname`.
+
+We also have the app in version `1.0.0` which doesn't use the `surname` column just yet. Check the `boot-flyway-v1` for an example of such an application.
+
+==== Rolling a new version
+
+Steps:
+
+. migrate your db to create the new column called `surname`. Now your db is in `v2`
+. copy the data from the `last_name` column to `surname`. *NOTE* that if you have a lot of this data then you should consider batch migration!
+. write the code to use *BOTH* the *new* and the *old* column. Now your app is in version `2.0.0`
+
+If you're using Spring Boot Flyway those two steps will be performed upon booting the version `2.0.0` of the app.  If you're running database versioning tool manually then you'd have to do it in separate processes (first manually upgrade the db version and then deploy the new app).
+
+IMPORTANT: Remember that the newly created column *MUST NOT* be *NOT NULL*. If you rollback, the old app has no knowledge of the new column and won't set it upon `Insert`. But if you add that constraint and your db is in `v2` it would require the value of the new column to be set. That would result in constraint violations.
+
+You can check the `boot-flyway-v2` for the examples of SQL Flyway scripts (point 2) and the code that sets data to both old and new columns (point 3).
+
+==== A/B testing
+
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second instance of the app that will be in version `2.0.0` and update the db to `v2`.
+
+Steps:
+
+. a new instance is deployed in version `2.0.0` that updates the db to `v2`
+. in the meantime some requests got processed by instances being in version `1.0.0`
+. the upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0`. All are talking to db in `v2`
+. version `1.0.0` is not using the database's column `surname` and version `2.0.0` is. They don't interfere each other, no exceptions should be thrown.
+. version `2.0.0` is saving data to both old and new column thus it's backwards compatible
+
+IMPORTANT: If you have any queries that count items basing on values from old / new column you have to remember that now you have duplicate values (most likely still being migrated). E.g. if you want to count the number of users whose last name (however you call it) starts with a letter `A` then until the data migration (`old` -> `new` column) is done you might have inconsistent data if you perform the query against the new column.
+
+==== Rolling back the application
+
+The current situation is that we have app in version `2.0.0` and db in `v2`.
+
+Steps:
+
+. roll back your app to version `1.0.0`.
+. version `1.0.0` is not using the database's column `surname` thus rollback should be successful
+
 == Projects
 
 We will focus on the most interesting case of changing the column name. That change is backwards
@@ -106,6 +149,6 @@ incompatible but we'll try to write it in such a way that A/B testing is possibl
 -------
 ├── boot-flyway-v1        - 1.0.0 version of the app with v1 of the schema
 ├── boot-flyway-v2        - 2.0.0 version of the app with v2 of the schema (backwards-compatible - app can be rolled back)
-├── boot-flyway-v2-bad    - 2.0.0 version of the app with v2 of the schema (backwards-incompatible - app can't be rolled back)
+├── boot-flyway-v2-bad    - 2.0.0 version of the app with v2 of the schema (backwards-incompatible - app cannot be rolled back)
 └── boot-flyway-v3        - 3.0.0. version of the app with v3 of the schema (app can be rolled back)
 -------
