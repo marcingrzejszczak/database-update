@@ -13,9 +13,20 @@ while developing the app:
 - we don't want to do DB rollbacks. Not doing them simplifies the deployment process (some rollbacks are close to impossible like rolling back a delete)
 - we want to *ALWAYS* be able to rollback the application one version back (not more)
 
-== The issue
-
 For readability we're versioning the apps with major increments.
+
+== TL;DR
+
+One of the approaches to do zero downtime deployment is to do the deploys in the following way for backwards incompatible changes (example for changing column name from `last_name` to `surname`):
+
+. deploy version `1.0.0` of the application with `v1` of db schema (column name = `last_name`)
+. deploy version `2.0.0` of the application that saves data to `last_name` and `surname` columns. Db is in version `v2` containing both `last_name` and `surname` columns.
+. deploy version `3.0.0` of the application that saves data only to `surname`. Db remains in `v2`
+. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v3` that removes the column.
+
+By following this approach you can always rollback one version back without breaking the DB / Application compatibility.
+
+== The issue
 
 Why is this problem worth discussing? Doing A/B testing with Cloud Foundry is extremely simple - it's a matter of executing a single command. However it's not that trivial in terms of the application and the db.
 
