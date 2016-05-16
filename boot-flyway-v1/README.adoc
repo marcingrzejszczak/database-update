@@ -1,6 +1,7 @@
 == Initial situation
 
 Version of the app: `1.0.0`
+
 Version of the DB: `v1`
 
 === DB changes
@@ -20,3 +21,7 @@ The app stores the Person data into a column called `last_name`:
 ----
 include::src/main/java/sample/flyway/Person.java[]
 ----
+
+=== Comment
+
+Initial state of the application. Nothing out of the ordinary.

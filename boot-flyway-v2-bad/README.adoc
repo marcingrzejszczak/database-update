@@ -1,9 +1,32 @@
-== Spring Boot Flyway Sample
+== Adding surname
 
-This sample demonstrates the flyway auto-configuration support.
+Version of the app: `2.0.0.BAD`
 
-You can look at `http://localhost:8080/flyway` to review the list of scripts.
+Version of the DB: `v2`
 
-This sample also enables the H2 console (at `http://localhost:8080/h2-console`)
-so that you can review the state of the database (the default jdbc url is
-`jdbc:h2:mem:testdb`).
+=== DB changes
+
+The migration script renames the column from `last_name` to `surname`
+
+Initial Flyway script:
+
+[source,sql,indent=0]
+----
+include::src/main/resources/db/migration/V1__init.sql[]
+----
+
+Script renaming `last_name`.
+
+[source,sql,indent=0]
+----
+include::src/main/resources/db/migration/V2__Rename_last_name.sql[]
+----
+
+=== Code changes
+
+We have changed the field name from `lastName` to `surName`.
+
+=== Comment
+
+Current changes DO NOT allow us to run two instances (old and new) at the same time. Thus zero down time
+deployment will be difficult to achieve (if we take into consideration out assumptions it's actually impossible).

@@ -1,9 +1,42 @@
-== Spring Boot Flyway Sample
+== Adding surname
 
-This sample demonstrates the flyway auto-configuration support.
+Version of the app: `2.0.0`
 
-You can look at `http://localhost:8080/flyway` to review the list of scripts.
+Version of the DB: `v2`
 
-This sample also enables the H2 console (at `http://localhost:8080/h2-console`)
-so that you can review the state of the database (the default jdbc url is
-`jdbc:h2:mem:testdb`).
+=== DB changes
+
+The db contains a column called `last_name`.
+
+Initial Flyway script:
+
+[source,sql,indent=0]
+----
+include::src/main/resources/db/migration/V1__init.sql[]
+----
+
+Script adding `surname` column.
+
+WARNING: Remember NOT TO ADD any NOT NULL constraints to the added column. Cause if you rollback the JAR
+ the old version doesn't have the notion of the added column and automatically a NULL value will be set. In case
+ of having a constraint the old application will blow up.
+
+[source,sql,indent=0]
+----
+include::src/main/resources/db/migration/V2__Add_surname.sql[]
+----
+
+=== Code changes
+
+We are storing data in both `last_name` and `surname`. Also, we are reading from the `last_name` column cause
+it is most up to date (during the deployment process some entries could have been round-robined to the old instance).
+
+[source,java,indent=0]
+----
+include::src/main/java/sample/flyway/Person.java[]
+----
+
+=== Comment
+
+By adding a new column and copying its contents we have created backwards compatible changes of the db. ATM if we
+rollback the JAR / have an old JAR working at the same tame it won't break at runtime.

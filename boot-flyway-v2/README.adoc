@@ -1,6 +1,7 @@
 == Adding surname
 
 Version of the app: `2.0.0`
+
 Version of the DB: `v2`
 
 === DB changes
@@ -34,3 +35,8 @@ it is most up to date (during the deployment process some entries could have bee
 ----
 include::src/main/java/sample/flyway/Person.java[]
 ----
+
+=== Comment
+
+By adding a new column and copying its contents we have created backwards compatible changes of the db. ATM if we
+rollback the JAR / have an old JAR working at the same tame it won't break at runtime.
