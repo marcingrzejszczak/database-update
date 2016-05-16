@@ -27,7 +27,6 @@ public class Person {
 	private Long id;
 	private String firstName;
 	private String lastName;
-	private String surname;
 
 	public String getFirstName() {
 		return this.firstName;
@@ -41,25 +40,13 @@ public class Person {
 		return this.lastName;
 	}
 
-	/**
-	 * Reading from the old column since it's most up to date. When there was a migration script ran
-	 * some entries were added to the old column.
-	 */
-	public String getSurname() {
-		return this.lastName;
-	}
-
-	/**
-	 * Storing both FIRST_NAME and SURNAME entries
-	 */
-	public void setSurname(String surname) {
-		this.lastName = surname;
-		this.surname = surname;
+	public void setLastName(String lastname) {
+		this.lastName = lastname;
 	}
 
 	@Override
 	public String toString() {
-		return "Person [firstName=" + this.firstName + ", lastName=" + this.lastName + ", surname=" + this.surname
+		return "Person [firstName=" + this.firstName + ", lastName=" + this.lastName
 				+ "]";
 	}
 }

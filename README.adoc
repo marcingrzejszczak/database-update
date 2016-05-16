@@ -20,9 +20,13 @@ For readability we're versioning the apps with major increments.
 One of the approaches to do zero downtime deployment is to do the deploys in the following way for backwards incompatible changes (example for changing column name from `last_name` to `surname`):
 
 . deploy version `1.0.0` of the application with `v1` of db schema (column name = `last_name`)
-. deploy version `2.0.0` of the application that saves data to `last_name` and `surname` columns. Db is in version `v2` containing both `last_name` and `surname` columns.
-. deploy version `3.0.0` of the application that saves data only to `surname`. Db remains in `v2`
-. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v3` that removes the column.
+. deploy version `2.0.0` of the application that saves data to `last_name` and `surname` columns.
+The app reads from `last_name` column. Db is in version `v2` containing both `last_name` and `surname` columns. The `surname` column is
+a copy of the `last_name` column. (NOTE: this column must not have the not null constraint)
+. once all apps got deployed in version `2.0.0` run a migration script to copy all data from `last_name` to `surname`
+. deploy version `3.0.0` of the application that saves data only to `surname` and reads from `surname`. Db remains in `v2`
+. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v3` that first
+preforms a final migration of `last_name` to `surname` and removes the `last_name` column. Here you can add any missing constraints
 
 By following this approach you can always rollback one version back without breaking the DB / Application compatibility.
 
@@ -163,3 +167,17 @@ incompatible but we'll try to write it in such a way that A/B testing is possibl
 ├── boot-flyway-v2-bad    - 2.0.0 version of the app with v2 of the schema (backwards-incompatible - app cannot be rolled back)
 └── boot-flyway-v3        - 3.0.0. version of the app with v3 of the schema (app can be rolled back)
 -------
+
+=== Spring Boot Sample Flyway
+
+All samples are clones of the `Spring Boot Sample Flyway` project.
+
+You can look at `http://localhost:8080/flyway` to review the list of scripts.
+
+The sample also enables the H2 console (at `http://localhost:8080/h2-console`)
+so that you can review the state of the database (the default jdbc url is
+`jdbc:h2:mem:testdb`).
+
+== Additional Reading
+
+- http://databaserefactoring.com[Database Refactoring patterns]
