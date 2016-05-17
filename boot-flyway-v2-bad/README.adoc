@@ -1,10 +1,46 @@
-== Adding surname
+=== Adding surname
 
 Version of the app: `2.0.0.BAD`
 
-Version of the DB: `v2`
+Version of the DB: `v2bad`
 
-=== DB changes
+==== Comment
+
+Current changes DO NOT allow us to run two instances (old and new) at the same time. Thus zero down time
+deployment will be difficult to achieve (if we take into consideration out assumptions it's actually impossible).
+
+===== A/B testing
+
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second
+instance of the app that will be in version `2.0.0.BAD` and update the db to `v2bad`.
+
+Steps:
+
+. a new instance is deployed in version `2.0.0.BAD` that updates the db to `v2bad`
+. in `v2bad` of the database the column `last_name` is no longer existing - it got changed to `surname`
+. the db and app upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0.BAD`. All are talking to db
+in `v2bad`
+. all instances of version `1.0.0` will start producing exceptions cause they will try to insert data to `last_name` column which is
+no longer there
+. all instances of version `2.0.0.BAD` will work without any issues
+
+As you can if we do backwards incompatible changes of the DB and the application, A/B testing is impossible.
+
+===== Rolling back the application
+
+Let's assume that after trying to do A/B deployment we've decided that we need to rollback the app back to version `1.0.0`. We assumed
+that we don't want to roll back the database.
+
+Steps:
+
+. we shut down the instance that was running with version `2.0.0.BAD`
+. the database is still in `v2bad`
+. since version `1.0.0` doesn't understand what `surname` column is it will produce exceptions
+. hell broke loose and we can't go back
+
+As you can if we do backwards incompatible changes of the DB and the application, we can't roll back to a previous version.
+
+==== DB changes
 
 The migration script renames the column from `last_name` to `surname`
 
@@ -22,11 +58,6 @@ Script renaming `last_name`.
 include::src/main/resources/db/migration/V2__Rename_last_name.sql[]
 ----
 
-=== Code changes
+==== Code changes
 
 We have changed the field name from `lastName` to `surName`.
-
-=== Comment
-
-Current changes DO NOT allow us to run two instances (old and new) at the same time. Thus zero down time
-deployment will be difficult to achieve (if we take into consideration out assumptions it's actually impossible).
