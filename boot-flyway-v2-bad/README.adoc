@@ -50,14 +50,14 @@ Initial Flyway script:
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/{organization}/{repo}/master/{module}/src/main/resources/db/migration/V1__init.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V1__init.sql[]
 ----
 
 Script renaming `last_name`.
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/{organization}/{repo}/master/{module}/src/main/resources/db/migration/V2__Rename_last_name.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V2__Rename_last_name.sql[]
 ----
 
 ==== Code changes

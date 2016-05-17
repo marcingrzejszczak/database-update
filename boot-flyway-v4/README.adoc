@@ -17,7 +17,7 @@ In comparison to `v3` we're just removing `last_name` column and add missing con
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/{organization}/{repo}/master/{module}/src/main/resources/db/migration/V4__Remove_lastname.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V4__Remove_lastname.sql[]
 ----
 
 ==== Code changes
