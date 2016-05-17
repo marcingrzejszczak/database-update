@@ -1,14 +1,14 @@
 == Adding surname
 
-Version of the app: `2.0.0`
+Version of the app: `3.0.0`
 
 Version of the DB: `v2`
 
 === DB changes
 
-The db contains a column called `last_name`.
+There are no changes in the DB.
 
-Initial Flyway script:
+The following:
 
 [source,sql,indent=0]
 ----
