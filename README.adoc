@@ -42,11 +42,98 @@ By following this approach you can always rollback one version back without brea
 Why is this problem worth discussing? Doing A/B testing with Cloud Foundry is extremely simple - it's a matter of executing a single
 command. However it's not that trivial in terms of the application and the db.
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v1/README.adoc[]
+:module: boot-flyway-v1
+
+=== Initial situation
+
+Version of the app: `1.0.0`
+
+Version of the DB: `v1`
+
+==== Comment
+
+This will be the initial state of the application that we will take into consideration.
+
+==== DB changes
+
+The db contains a column called `last_name`.
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v1/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V1__init.sql[]
+----
+
+==== Code changes
+
+The app stores the Person data into a column called `last_name`:
+
+[source,java,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v1/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+----
 
 == Adding a new column
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-newcolumn/README.adoc[]
+:module: boot-flyway-v2-newcolumn
+
+=== Adding a new column
+
+Version of the app: `2.0.0.NEWCOLUMN`
+
+Version of the DB: `v2newcolumn`
+
+==== Comment
+
+===== Rolling a new version
+
+Steps:
+
+. migrate your db to create the new column called `age`. Now your db is in `v2newcolumn`
+. write the code to use the new column. Now your app is in version `2.0.0.NEWCOLUMN`
+
+If you're using Spring Boot Flyway those two steps will be performed upon booting the version `2.0.0.NEWCOLUMN` of the app.
+If you're running database versioning tool manually then you'd have to do it in separate processes
+(first manually upgrade the db version and then deploy the new app).
+
+===== A/B testing
+
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second
+instance of the app that will be in version `2.0.0.NEWCOLUMN` and update the db to `v2newcolumn`.
+
+Steps:
+
+. a new instance is deployed in version `2.0.0.NEWCOLUMN` that updates the db to `v2newcolumn`
+. in the meantime some requests got processed by instances being in version `1.0.0`
+. the upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0.NEWCOLUMN`. All are talking to db in `v2newcolumn`
+. version `1.0.0` is not using the database's column `age` and version `2.0.0.NEWCOLUMN` is. They don't interfere each other, no exceptions
+should be thrown.
+
+===== Rolling back the application
+
+The current situation is that we have app in version `2.0.0.NEWCOLUMN` and db in `v2newcolumn`.
+
+Steps:
+
+. roll back your app to version `1.0.0`.
+. version `1.0.0` is not using the database's column `age` thus rollback should be successful
+
+==== DB changes
+
+The script adds a new column called `age`.
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-newcolumn/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V2__Add_age.sql[]
+----
+
+==== Code changes
+
+The app uses the new column. No breaking changes were introduced.
+
+[source,java,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-newcolumn/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+----
 
 == Renaming a column in backwards-incompatible way
 
@@ -55,7 +142,71 @@ Let's take a look at the following example if you want to change the column name
 WARNING: The following example is deliberately done in such a way that it will break. We're showing it to depict the problem of database
 compatibility.
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-bad/README.adoc[]
+:module: boot-flyway-v2-bad
+
+=== Adding surname
+
+Version of the app: `2.0.0.BAD`
+
+Version of the DB: `v2bad`
+
+==== Comment
+
+Current changes DO NOT allow us to run two instances (old and new) at the same time. Thus zero down time
+deployment will be difficult to achieve (if we take into consideration out assumptions it's actually impossible).
+
+===== A/B testing
+
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second
+instance of the app that will be in version `2.0.0.BAD` and update the db to `v2bad`.
+
+Steps:
+
+. a new instance is deployed in version `2.0.0.BAD` that updates the db to `v2bad`
+. in `v2bad` of the database the column `last_name` is no longer existing - it got changed to `surname`
+. the db and app upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0.BAD`. All are talking to db
+in `v2bad`
+. all instances of version `1.0.0` will start producing exceptions cause they will try to insert data to `last_name` column which is
+no longer there
+. all instances of version `2.0.0.BAD` will work without any issues
+
+As you can if we do backwards incompatible changes of the DB and the application, A/B testing is impossible.
+
+===== Rolling back the application
+
+Let's assume that after trying to do A/B deployment we've decided that we need to rollback the app back to version `1.0.0`. We assumed
+that we don't want to roll back the database.
+
+Steps:
+
+. we shut down the instance that was running with version `2.0.0.BAD`
+. the database is still in `v2bad`
+. since version `1.0.0` doesn't understand what `surname` column is it will produce exceptions
+. hell broke loose and we can't go back
+
+As you can if we do backwards incompatible changes of the DB and the application, we can't roll back to a previous version.
+
+==== DB changes
+
+The migration script renames the column from `last_name` to `surname`
+
+Initial Flyway script:
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-bad/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V1__init.sql[]
+----
+
+Script renaming `last_name`.
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-bad/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V2__Rename_last_name.sql[]
+----
+
+==== Code changes
+
+We have changed the field name from `lastName` to `surName`.
 
 == Renaming a column in backwards-compatible way
 
@@ -67,11 +218,154 @@ It contains the columns `first_name` and `last_name`. We want to change the `las
 We also have the app in version `1.0.0` which doesn't use the `surname` column just yet. Check the `boot-flyway-v1` for an example
 of such an application.
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/README.adoc[]
+:module: boot-flyway-v2
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v3/README.adoc[]
+=== Adding surname
 
-Unresolved directive in README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v4/README.adoc[]
+Version of the app: `2.0.0`
+
+Version of the DB: `v2`
+
+==== Comment
+
+By adding a new column and copying its contents we have created backwards compatible changes of the db. ATM if we
+rollback the JAR / have an old JAR working at the same tame it won't break at runtime.
+
+===== Rolling a new version
+
+Steps:
+
+. migrate your db to create the new column called `surname`. Now your db is in `v2`
+. copy the data from the `last_name` column to `surname`. *NOTE* that if you have a lot of this data then you should consider batch
+migration!
+. write the code to use *BOTH* the *new* and the *old* column. Now your app is in version `2.0.0`
+
+If you're using Spring Boot Flyway those two steps will be performed upon booting the version `2.0.0` of the app.  If you're running
+database versioning tool manually then you'd have to do it in separate processes (first manually upgrade the db version and then deploy
+the new app).
+
+IMPORTANT: Remember that the newly created column *MUST NOT* be *NOT NULL*. If you rollback, the old app has no knowledge of the new
+column and won't set it upon `Insert`. But if you add that constraint and your db is in `v2` it would require the value of the new
+column to be set. That would result in constraint violations.
+
+===== A/B testing
+
+The current situation is that we have an app deployed to production in version `1.0.0` and db in `v1`. We want to deploy the second
+instance of the app that will be in version `2.0.0` and update the db to `v2`.
+
+Steps:
+
+. a new instance is deployed in version `2.0.0` that updates the db to `v2`
+. in the meantime some requests got processed by instances being in version `1.0.0`
+. the upgrade is successful and you have some instances working in `1.0.0`, others in `2.0.0`. All are talking to db in `v2`
+. version `1.0.0` is not using the database's column `surname` and version `2.0.0` is. They don't interfere each other, no exceptions
+should be thrown.
+. version `2.0.0` is saving data to both old and new column thus it's backwards compatible
+
+IMPORTANT: If you have any queries that count items basing on values from old / new column you have to remember that now you have
+duplicate values (most likely still being migrated). E.g. if you want to count the number of users whose last name (however you call it)
+starts with a letter `A` then until the data migration (`old` -> `new` column) is done you might have inconsistent data if you
+perform the query against the new column.
+
+===== Rolling back the application
+
+The current situation is that we have app in version `2.0.0` and db in `v2`.
+
+Steps:
+
+. roll back your app to version `1.0.0`.
+. version `1.0.0` is not using the database's column `surname` thus rollback should be successful
+
+==== DB changes
+
+The db contains a column called `last_name`.
+
+Initial Flyway script:
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V1__init.sql[]
+----
+
+Script adding `surname` column.
+
+WARNING: Remember NOT TO ADD any NOT NULL constraints to the added column. Cause if you rollback the JAR
+ the old version doesn't have the notion of the added column and automatically a NULL value will be set. In case
+ of having a constraint the old application will blow up.
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V2__Add_surname.sql[]
+----
+
+==== Code changes
+
+We are storing data in both `last_name` and `surname`. Also, we are reading from the `last_name` column cause
+it is most up to date (during the deployment process some entries could have been round-robined to the old instance).
+
+[source,java,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+----
+
+:module: boot-flyway-v3
+
+=== Removing last name from code
+
+Version of the app: `3.0.0`
+
+Version of the DB: `v2`
+
+==== Comment
+
+By adding a new column and copying its contents we have created backwards compatible changes of the db. ATM if we
+rollback the JAR / have an old JAR working at the same time it won't break at runtime.
+
+==== DB changes
+
+There are no structure changes in the DB. The following script is executed that performs the final migration of old data:
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v3/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V3__Final_migration.sql[]
+----
+
+
+==== Code changes
+
+We are storing data in both `last_name` and `surname`. Also, we are reading from the `last_name` column cause
+it is most up to date (during the deployment process some entries could have been round-robined to the old instance).
+
+[source,java,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v3/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+----
+
+:module: boot-flyway-v4
+
+=== Removing last name from db
+
+Version of the app: `4.0.0`
+
+Version of the DB: `v3`
+
+==== Comment
+
+Since code of version `3.0.0` wasn't using `last_name` column, if we roll back to `3.0.0` after removing the
+column from the database then nothing bad will happen at runtime.
+
+==== DB changes
+
+In comparison to `v3` we're just removing `last_name` column and add missing constraints.
+
+[source,sql,indent=0]
+----
+Unresolved directive in https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v4/README.adoc - include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V4__Remove_lastname.sql[]
+----
+
+==== Code changes
+
+There are no code changes.
 
 == Projects
 

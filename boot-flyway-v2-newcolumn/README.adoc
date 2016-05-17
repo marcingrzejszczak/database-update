@@ -1,5 +1,3 @@
-:module: boot-flyway-v2-newcolumn
-
 === Adding a new column
 
 Version of the app: `2.0.0.NEWCOLUMN`
@@ -47,7 +45,7 @@ The script adds a new column called `age`.
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V2__Add_age.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-newcolumn/src/main/resources/db/migration/V2__Add_age.sql[]
 ----
 
 ==== Code changes
@@ -56,5 +54,5 @@ The app uses the new column. No breaking changes were introduced.
 
 [source,java,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2-newcolumn/src/main/java/sample/flyway/Person.java[]
 ----

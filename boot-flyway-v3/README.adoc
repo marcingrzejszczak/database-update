@@ -1,5 +1,3 @@
-:module: boot-flyway-v3
-
 === Removing last name from code
 
 Version of the app: `3.0.0`
@@ -17,7 +15,7 @@ There are no structure changes in the DB. The following script is executed that 
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V3__Final_migration.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v3/src/main/resources/db/migration/V3__Final_migration.sql[]
 ----
 
 
@@ -28,5 +26,5 @@ it is most up to date (during the deployment process some entries could have bee
 
 [source,java,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/java/sample/flyway/Person.java[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v3/src/main/java/sample/flyway/Person.java[]
 ----

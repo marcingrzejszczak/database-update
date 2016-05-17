@@ -1,5 +1,3 @@
-:module: boot-flyway-v4
-
 === Removing last name from db
 
 Version of the app: `4.0.0`
@@ -17,7 +15,7 @@ In comparison to `v3` we're just removing `last_name` column and add missing con
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/{module}/src/main/resources/db/migration/V4__Remove_lastname.sql[]
+include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v4/src/main/resources/db/migration/V4__Remove_lastname.sql[]
 ----
 
 ==== Code changes
