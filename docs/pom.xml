@@ -3,9 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-sample-flyway-parent</artifactId>
-		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-build</artifactId>
+		<version>1.1.0.RELEASE</version>
+		<relativePath/>
+		<!-- lookup parent from repository -->
 	</parent>
 	<artifactId>database-update-docs</artifactId>
 	<packaging>pom</packaging>
@@ -13,7 +15,7 @@
 	<description>Database Update Blog Post Docs</description>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<properties>
-		<docs.main>README</docs.main>
+		<docs.main>database-update</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
 	</properties>
 	<profiles>
@@ -26,24 +28,16 @@
 						<artifactId>asciidoctor-maven-plugin</artifactId>
 						<version>1.5.3</version>
 						<inherited>false</inherited>
-						<configuration>
-							<outputDirectory>${main.basedir}</outputDirectory>
-							<sourceHighlighter>coderay</sourceHighlighter>
-							<backend>html</backend>
-							<attributes>
-								<toc/>
-								<linkcss>false</linkcss>
-							</attributes>
-						</configuration>
-						<executions>
-							<execution>
-								<id>output-html</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>process-asciidoc</goal>
-								</goals>
-							</execution>
-						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<inherited>false</inherited>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<inherited>false</inherited>
 					</plugin>
 				</plugins>
 			</build>

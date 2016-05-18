@@ -1,0 +1,98 @@
+= Database Update
+
+How to write the code of your app to allow doing A/B testing or/and continuous deployment.
+
+== Assumptions
+
+In order for the process to be relatively simple the following assumptions need to take place
+while developing the app:
+
+- use a database versioning tool (we'll be using https://flywaydb.org[Flyway])
+- the database changes need to be backwards compatible
+- if you want to do a backwards incompatible change you have to do it in a couple of deployments
+- we don't want to do DB rollbacks. Not doing them simplifies the deployment process (some rollbacks are close to impossible like
+rolling back a delete)
+- we want to *ALWAYS* be able to rollback the application one version back (not more)
+
+For readability we're versioning the apps with major increments.
+
+== TL;DR
+
+One of the approaches to do zero downtime deployment is to do the deploys in the following way for backwards incompatible changes
+(example for changing column name from `last_name` to `surname`):
+
+. deploy version `1.0.0` of the application with `v1` of db schema (column name = `last_name`)
+. deploy version `2.0.0` of the application that saves data to `last_name` and `surname` columns.
+The app reads from `last_name` column. Db is in version `v2` containing both `last_name` and `surname` columns. The `surname` column is
+a copy of the `last_name` column. (NOTE: this column must not have the not null constraint)
+. once all apps got deployed in version `2.0.0` run a migration script to copy all data from `last_name` to `surname`
+. deploy version `3.0.0` of the application that saves data only to `surname` and reads from `surname`. Db remains in `v2`
+. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v3` that first
+preforms a final migration of `last_name` to `surname` and removes the `last_name` column. Here you can add any missing constraints
+
+By following this approach you can always rollback one version back without breaking the DB / Application compatibility.
+
+== The issue
+
+Why is this problem worth discussing? Doing A/B testing with Cloud Foundry is extremely simple - it's a matter of executing a single
+command. However it's not that trivial in terms of the application and the db.
+
+include::../../../../boot-flyway-v1/README.adoc[]
+
+== Adding a new column
+
+include::../../../../boot-flyway-v2-newcolumn/README.adoc[]
+
+== Renaming a column in backwards-incompatible way
+
+Let's take a look at the following example if you want to change the column name:
+
+WARNING: The following example is deliberately done in such a way that it will break. We're showing it to depict the problem of database
+compatibility.
+
+include::../../../../boot-flyway-v2-bad/README.adoc[]
+
+== Renaming a column in backwards-compatible way
+
+TIP: Here we'll present a more sound approach to deployment
+
+This situation is more interesting. Let's assume that we have the DB in version `v1`. As a reminder -
+It contains the columns `first_name` and `last_name`. We want to change the `last_name` into `surname`.
+
+We also have the app in version `1.0.0` which doesn't use the `surname` column just yet. Check the `boot-flyway-v1` for an example
+of such an application.
+
+include::../../../../boot-flyway-v2/README.adoc[]
+
+include::../../../../boot-flyway-v3/README.adoc[]
+
+include::../../../../boot-flyway-v4/README.adoc[]
+
+== Projects
+
+We will focus on the most interesting case of changing the column name. That change is backwards
+incompatible but we'll try to write it in such a way that A/B testing is possible.
+
+[source,bash]
+-------
+├── boot-flyway-v1              - 1.0.0 version of the app with v1 of the schema
+├── boot-flyway-v2              - 2.0.0 version of the app with v2 of the schema (backwards-compatible - app can be rolled back)
+├── boot-flyway-v2-bad          - 2.0.0.BAD version of the app with v2bad of the schema (backwards-incompatible - app cannot be rolled back)
+├── boot-flyway-v2-newcolumn    - 2.0.0.NEWCOLUMN version of the app with v2newcolumn of the schema (backwards-compatible - contains a new added column; app can be rolled back)
+├── boot-flyway-v3              - 3.0.0 version of the app with v3 of the schema (app can be rolled back)
+└── boot-flyway-v4              - 4.0.0 version of the app with v4 of the schema (app can be rolled back)
+-------
+
+== Spring Boot Sample Flyway
+
+All samples are clones of the `Spring Boot Sample Flyway` project.
+
+You can look at `http://localhost:8080/flyway` to review the list of scripts.
+
+The sample also enables the H2 console (at `http://localhost:8080/h2-console`)
+so that you can review the state of the database (the default jdbc url is
+`jdbc:h2:mem:testdb`).
+
+== Additional Reading
+
+- http://databaserefactoring.com[Database Refactoring patterns]
