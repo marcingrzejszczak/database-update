@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(SampleFlywayApplication.class)
+@SpringApplicationConfiguration(SampleFlywayApplicationV2.class)
 public class SampleFlywayApplicationTests {
 
 	@Autowired private JdbcTemplate template;

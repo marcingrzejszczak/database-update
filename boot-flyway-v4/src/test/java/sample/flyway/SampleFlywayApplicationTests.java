@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(SampleFlywayApplication.class)
+@SpringApplicationConfiguration(SampleFlywayApplicationV4.class)
 public class SampleFlywayApplicationTests {
 	@Autowired private JdbcTemplate template;
 

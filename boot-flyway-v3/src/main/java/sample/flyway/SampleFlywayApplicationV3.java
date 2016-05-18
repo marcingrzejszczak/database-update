@@ -22,7 +22,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SampleFlywayApplication implements CommandLineRunner {
+public class SampleFlywayApplicationV3 implements CommandLineRunner {
 
 	@Autowired
 	private PersonRepository repository;
@@ -33,7 +33,7 @@ public class SampleFlywayApplication implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(SampleFlywayApplication.class, args);
+		SpringApplication.run(SampleFlywayApplicationV3.class, args);
 	}
 
 }

@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(SampleFlywayApplication.class)
+@SpringApplicationConfiguration(SampleFlywayApplicationV3.class)
 public class SampleFlywayApplicationTests {
 	@Autowired private JdbcTemplate template;
 
