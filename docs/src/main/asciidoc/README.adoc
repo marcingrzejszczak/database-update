@@ -2,6 +2,11 @@
 
 How to write the code of your app to allow doing A/B testing or/and continuous deployment.
 
+== Scripts
+
+You can build all apps by running the `./buildAll.sh`.
+To start local H2 just run `./scripts/startH2.sh`
+
 == Assumptions
 
 In order for the process to be relatively simple the following assumptions need to take place
