@@ -22,6 +22,7 @@ public class PersonController {
 		Person person = new Person();
 		UUID uuid = UUID.randomUUID();
 		person.setFirstName(uuid.toString());
+		person.setLastName(uuid.toString());
 		person.setAge(new Random().nextInt());
 		personRepository.save(person);
 	}

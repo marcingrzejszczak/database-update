@@ -18,25 +18,41 @@ package sample.flyway;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(SampleFlywayApplication.class)
 public class SampleFlywayApplicationTests {
+	@Autowired private JdbcTemplate template;
 
-	@Autowired
-	private JdbcTemplate template;
+	@Autowired private PersonRepository personRepository;
 
 	@Test
 	public void testDefaultSettings() throws Exception {
 		assertEquals(new Integer(1), this.template
 				.queryForObject("SELECT COUNT(*) from PERSON", Integer.class));
+		Person person = personRepository.findAll().iterator().next();
+		assertEquals(person.getFirstName(), "Dave");
+		assertEquals(person.getSurname(), "Syer");
+	}
+
+	@Test
+	public void should_have_the_last_name_column_removed_from_db() throws Exception {
+		try {
+			assertEquals(new Integer(1), this.template
+					.queryForObject("SELECT COUNT(last_name) from PERSON", Integer.class));
+			fail();
+		} catch (BadSqlGrammarException e) {
+			assertTrue(e.getSQLException().getMessage().contains("Column \"LAST_NAME\" not found;"));
+		}
 	}
 
 }

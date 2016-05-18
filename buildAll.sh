@@ -6,6 +6,6 @@ for D in `find . -type d -name 'boot-flyway-v*'`
 do
     echo "Building [$D]"
     cd $D
-    ./mvnw clean verify
+    ./mvnw clean package
     cd ..
 done
