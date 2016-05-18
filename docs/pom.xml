@@ -15,7 +15,7 @@
 	<description>Database Update Blog Post Docs</description>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<properties>
-		<docs.main>database-update</docs.main>
+		<docs.main>index</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
 	</properties>
 	<profiles>
