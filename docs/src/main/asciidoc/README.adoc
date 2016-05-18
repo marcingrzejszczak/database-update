@@ -4,8 +4,24 @@ How to write the code of your app to allow doing A/B testing or/and continuous d
 
 == Scripts
 
-You can build all apps by running the `./buildAll.sh`.
-To start local H2 just run `./scripts/startH2.sh`
+There are 2 scenarios:
+
+- Backwards compatbile
+- Backwards incompatible
+
+To check the *backwards compatible* case just run:
+
+[source,bash]
+-------
+./scripts/scenario_backwards_compatible.sh
+-------
+
+To check the *backwards incompatbile* case just run:
+
+[source,bash]
+-------
+./scripts/scenario_backwards_incompatible.sh
+-------
 
 == Assumptions
 
