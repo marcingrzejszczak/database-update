@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 WAIT_TIME="${WAIT_TIME:-5}"
 RETRIES="${RETRIES:-70}"
 SERVICE_PORT="${SERVICE_PORT:-8081}"
@@ -23,6 +25,7 @@ function curl_health_endpoint() {
 
 # Runs the `java -jar` for given application $1 and system properties $2
 function java_jar() {
+    echo -e "Starting app $1 \n"
     local APP_JAVA_PATH=$1/target
     local EXPRESSION="nohup ${JAVA_PATH_TO_BIN}java $2 $MEM_ARGS -jar $APP_JAVA_PATH/*.jar >$APP_JAVA_PATH/nohup.log &"
     echo -e "\nTrying to run [$EXPRESSION]"
@@ -35,16 +38,43 @@ function java_jar() {
     return 0
 }
 
+# Kills an app with given $1 version
+function kill_app() {
+    echo -e "Killing app $1\n"
+    pkill -f "spring-boot-sample-flyway-$1-SNAPSHOT"
+    return 0
+}
+
+# Runs H2 from proper folder
+function build_all_apps() {
+    ${ROOT_FOLDER}/buildAll.sh
+}
+
+# Kill all the apps
+function kill_all_apps() {
+    ${ROOT_FOLDER}/scripts/stopApps.sh
+}
+
 # Runs H2 from proper folder
 function run_h2() {
     ${ROOT_FOLDER}/scripts/startH2.sh
 }
 
+# Stops H2 from proper folder
+function stop_h2() {
+    ${ROOT_FOLDER}/scripts/stopH2.sh
+}
+
+# Stops H2 from proper folder
+function clear_h2() {
+    ${ROOT_FOLDER}/scripts/clearH2.sh
+}
+
 # Calls a POST curl to /person to an app on localhost with port $1
 function generate_person() {
     echo "Sending a post to 127.0.0.1:$1/person"
-    curl -X POST "127.0.0.1:${1}/person"
-    return 0
+    curl --fail -X POST "127.0.0.1:${1}/person"
+    return $?
 }
 
 export WAIT_TIME
@@ -54,8 +84,13 @@ export SERVICE_PORT
 export -f curl_local_health_endpoint
 export -f curl_health_endpoint
 export -f java_jar
+export -f build_all_apps
 export -f run_h2
+export -f stop_h2
+export -f clear_h2
 export -f generate_person
+export -f kill_app
+export -f kill_all_apps
 
 ROOT_FOLDER=`pwd`
 if [[ ! -e "${ROOT_FOLDER}/h2" ]]; then
