@@ -62,7 +62,7 @@ Initial Flyway script:
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/src/main/resources/db/migration/V1__init.sql[]
+include::src/main/resources/db/migration/V1__init.sql[]
 ----
 
 Script adding `surname` column.
@@ -73,7 +73,7 @@ WARNING: Remember NOT TO ADD any NOT NULL constraints to the added column. Cause
 
 [source,sql,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/src/main/resources/db/migration/V2__Add_surname.sql[]
+include::src/main/resources/db/migration/V2__Add_surname.sql[]
 ----
 
 ==== Code changes
@@ -83,5 +83,5 @@ it is most up to date (during the deployment process some entries could have bee
 
 [source,java,indent=0]
 ----
-include::https://raw.githubusercontent.com/marcingrzejszczak/database-update/master/boot-flyway-v2/src/main/java/sample/flyway/Person.java[]
+include::src/main/java/sample/flyway/Person.java[]
 ----

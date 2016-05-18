@@ -26,16 +26,24 @@
 						<artifactId>asciidoctor-maven-plugin</artifactId>
 						<version>1.5.3</version>
 						<inherited>false</inherited>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<inherited>false</inherited>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<inherited>false</inherited>
+						<configuration>
+							<outputDirectory>${main.basedir}</outputDirectory>
+							<sourceHighlighter>coderay</sourceHighlighter>
+							<backend>html</backend>
+							<attributes>
+								<toc/>
+								<linkcss>false</linkcss>
+							</attributes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>output-html</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
