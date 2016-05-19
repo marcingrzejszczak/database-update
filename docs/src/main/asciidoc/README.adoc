@@ -53,6 +53,12 @@ preforms a final migration of `last_name` to `surname` and removes the `last_nam
 
 By following this approach you can always rollback one version back without breaking the DB / Application compatibility.
 
+There are also two other app versions:
+
+- version `2.0.0.NEWCOLUMN` with a backwards compatible change of adding a new column (`age`).
+- version `2.0.0.BAD` with a backwards incompatible change that will not allow you to have to instances running at the same time
+(version `1.0.0` with `2.0.0.BAD`)
+
 == The issue
 
 Why is this problem worth discussing? Doing A/B testing with Cloud Foundry is extremely simple - it's a matter of executing a single
