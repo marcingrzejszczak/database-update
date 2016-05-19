@@ -26,23 +26,23 @@ build_all_apps
 
 # APP 1.0.0 and 2.0.0.BAD
 
-echo -e "Starting app in version 1.0.0\n"
+echo -e "\nStarting app in version 1.0.0\n"
 java_jar boot-flyway-v1 -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 1.0.0. to boot\n"
+echo -e "\nWaiting for the app 1.0.0. to boot\n"
 curl_local_health_endpoint 9991
 
-echo -e "Generate a person in version 1.0.0\n"
+echo -e "\nGenerate a person in version 1.0.0\n"
 generate_person 9991
 
-echo -e "Starting app in version 2.0.0.BAD\n"
+echo -e "\nStarting app in version 2.0.0.BAD\n"
 java_jar boot-flyway-v2-bad -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 2.0.0.BAD to boot\n"
+echo -e "\nWaiting for the app 2.0.0.BAD to boot\n"
 curl_local_health_endpoint 9995
 
-echo -e "Generate a person in version 1.0.0\n"
+echo -e "\nGenerate a person in version 1.0.0\n"
 (generate_person 9991) || echo -e "\n\n EXCEPTION OCCURRED WHILE TRYING TO GENERATE A PERSON. THAT'S BECAUSE THE APP IS BACKWARDS INCOMPATIBLE \n\n"
 
-echo -e "Generate a person in version 2.0.0.BAD\n"
-generate_person 9995 && echo -e "\n\n AND THIS PASSED CAUSE THE APP INTRODUCED BACKWARDS INCOMPATBILE CHANGES"
+echo -e "\nGenerate a person in version 2.0.0.BAD\n"
+generate_person 9995 && echo -e "\n\n AND THIS PASSED CAUSE THIS VERSION OF THE APP INTRODUCED BACKWARDS INCOMPATBILE CHANGES"

@@ -36,55 +36,55 @@ build_all_apps
 
 # APP 1.0.0 and 2.0.0
 
-echo -e "Starting app in version 1.0.0\n"
+echo -e "\nStarting app in version 1.0.0\n"
 java_jar boot-flyway-v1 -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 1.0.0. to boot\n"
+echo -e "\nWaiting for the app 1.0.0. to boot\n"
 curl_local_health_endpoint 9991
 
-echo -e "Generate a person in version 1.0.0\n"
+echo -e "\nGenerate a person in version 1.0.0\n"
 generate_person 9991
 
-echo -e "Starting app in version 2.0.0\n"
+echo -e "\nStarting app in version 2.0.0\n"
 java_jar boot-flyway-v2 -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 2.0.0 to boot\n"
+echo -e "\nWaiting for the app 2.0.0 to boot\n"
 curl_local_health_endpoint 9992
 
-echo -e "Generate a person in version 1.0.0\n"
+echo -e "\nGenerate a person in version 1.0.0\n"
 generate_person 9991
 
-echo -e "Generate a person in version 2.0.0\n"
+echo -e "\nGenerate a person in version 2.0.0\n"
 generate_person 9992
 
 # APP 2.0.0 and 3.0.0
 
 kill_app "1.0.0"
 
-echo -e "Starting app in version 3.0.0\n"
+echo -e "\nStarting app in version 3.0.0\n"
 java_jar boot-flyway-v3 -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 3.0.0. to boot\n"
+echo -e "\nWaiting for the app 3.0.0. to boot\n"
 curl_local_health_endpoint 9993
 
-echo -e "Generate a person in version 2.0.0\n"
+echo -e "\nGenerate a person in version 2.0.0\n"
 generate_person 9992
 
-echo -e "Generate a person in version 3.0.0\n"
+echo -e "\nGenerate a person in version 3.0.0\n"
 generate_person 9993
 
 # APP 3.0.0 and 4.0.0
 
 kill_app "2.0.0"
 
-echo -e "Starting app in version 4.0.0\n"
+echo -e "\nStarting app in version 4.0.0\n"
 java_jar boot-flyway-v4 -Dspring.profiles.active=standalone
 
-echo -e "Waiting for the app 4.0.0. to boot\n"
+echo -e "\nWaiting for the app 4.0.0. to boot\n"
 curl_local_health_endpoint 9994
 
-echo -e "Generate a person in version 2.0.0\n"
+echo -e "\nGenerate a person in version 2.0.0\n"
 generate_person 9993
 
-echo -e "Generate a person in version 3.0.0\n"
+echo -e "\nGenerate a person in version 3.0.0\n"
 generate_person 9994

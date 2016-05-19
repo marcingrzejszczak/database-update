@@ -47,12 +47,12 @@ function kill_app() {
 
 # Runs H2 from proper folder
 function build_all_apps() {
-    ${ROOT_FOLDER}/buildAll.sh
+    ${ROOT_FOLDER}/scripts/build_all.sh
 }
 
 # Kill all the apps
 function kill_all_apps() {
-    ${ROOT_FOLDER}/scripts/stopApps.sh
+    ${ROOT_FOLDER}/scripts/kill_apps.sh
 }
 
 # Runs H2 from proper folder
@@ -72,7 +72,7 @@ function clear_h2() {
 
 # Calls a POST curl to /person to an app on localhost with port $1
 function generate_person() {
-    echo "Sending a post to 127.0.0.1:$1/person"
+    echo -e "Sending a post to 127.0.0.1:$1/person. This is the response:\n"
     curl --fail -X POST "127.0.0.1:${1}/person"
     return $?
 }

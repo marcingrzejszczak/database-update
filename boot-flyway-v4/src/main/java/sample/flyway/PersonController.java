@@ -17,12 +17,12 @@ public class PersonController {
 	@Autowired PersonRepository personRepository;
 
 	@RequestMapping(method = RequestMethod.POST)
-	public void generatePerson() {
+	public Person generatePerson() {
 		Person person = new Person();
 		UUID uuid = UUID.randomUUID();
 		person.setFirstName(uuid.toString());
 		person.setSurname(uuid.toString());
-		personRepository.save(person);
+		return personRepository.save(person);
 	}
 
 }
