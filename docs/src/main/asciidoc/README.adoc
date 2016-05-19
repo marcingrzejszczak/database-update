@@ -46,9 +46,9 @@ One of the approaches to do zero downtime deployment is to do the deploys in the
 . deploy version `2.0.0` of the application that saves data to `last_name` and `surname` columns.
 The app reads from `last_name` column. Db is in version `v2` containing both `last_name` and `surname` columns. The `surname` column is
 a copy of the `last_name` column. (NOTE: this column must not have the not null constraint)
-. once all apps got deployed in version `2.0.0` run a migration script to copy all data from `last_name` to `surname`
-. deploy version `3.0.0` of the application that saves data only to `surname` and reads from `surname`. Db remains in `v2`
-. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v3` that first
+. deploy version `3.0.0` of the application that saves data only to `surname` and reads from `surname`. As for the db the final
+migration of `last_name` to `surname` takes place. Also the *NOT NULL* constraint is dropped from `last_name`. Db is now in version `v3`
+. deploy version `4.0.0` of the application - there are no changes in the code. Deploy db in `v4` that first
 preforms a final migration of `last_name` to `surname` and removes the `last_name` column. Here you can add any missing constraints
 
 By following this approach you can always rollback one version back without breaking the DB / Application compatibility.
