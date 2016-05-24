@@ -83,8 +83,8 @@ java_jar boot-flyway-v4 -Dspring.profiles.active=standalone
 echo -e "\nWaiting for the app 4.0.0. to boot\n"
 curl_local_health_endpoint 9994
 
-echo -e "\nGenerate a person in version 2.0.0\n"
+echo -e "\nGenerate a person in version 3.0.0\n"
 generate_person 9993
 
-echo -e "\nGenerate a person in version 3.0.0\n"
+echo -e "\nGenerate a person in version 4.0.0\n"
 generate_person 9994
