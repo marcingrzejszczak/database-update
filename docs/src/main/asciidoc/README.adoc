@@ -200,7 +200,6 @@ Once you clone the repo you'll see the following folder structure.
 ├── boot-flyway-v1              - 1.0.0 version of the app with v1 of the schema
 ├── boot-flyway-v2              - 2.0.0 version of the app with v2 of the schema (backwards-compatible - app can be rolled back)
 ├── boot-flyway-v2-bad          - 2.0.0.BAD version of the app with v2bad of the schema (backwards-incompatible - app cannot be rolled back)
-├── boot-flyway-v2-newcolumn    - 2.0.0.NEWCOLUMN version of the app with v2newcolumn of the schema (backwards-compatible - contains a new added column; app can be rolled back)
 ├── boot-flyway-v3              - 3.0.0 version of the app with v3 of the schema (app can be rolled back)
 └── boot-flyway-v4              - 4.0.0 version of the app with v4 of the schema (app can be rolled back)
 -------

@@ -25,7 +25,6 @@
         <module>docs</module>
         <module>boot-flyway-v1</module>
         <module>boot-flyway-v2</module>
-        <module>boot-flyway-v2-newcolumn</module>
         <module>boot-flyway-v2-bad</module>
         <module>boot-flyway-v3</module>
         <module>boot-flyway-v4</module>
