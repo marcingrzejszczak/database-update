@@ -12,7 +12,7 @@ downtime deployment and at the end of day apply a backwards incompatible databas
 What is this mythical *zero downtime deployment*? You can say that your application is deployed that way if you can
 successfully introduce a new version of your application to production without making the user see that the application
 went down in the meantime. From the user's and the company's point of view it's the best possible scenario of deployment
-since new features can be introduced, bugs can be eliminated without any outage.
+since new features can be introduced and bugs can be eliminated without any outage.
 
 How can you achieve that? There are number of ways but one of them is just to:
 
@@ -27,7 +27,7 @@ common deployment process which is the blue green deployment.
 
 Have you ever heard of http://martinfowler.com/bliki/BlueGreenDeployment.html[blue green deployment]? With Cloud Foundry it's
  extremely easy to do. Just check out https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments[this article] where
- we describe it in more depth. To quickly recap:
+ we describe it in more depth. To quickly recap, doing blue green deployment is as simple as:
 
 [quote]
 -----
@@ -44,7 +44,8 @@ you can easily rollback your router to point to a previous environment just by "
 After reading all of the above you could ask yourself a question: _What does zero downtime deployment have to do with Blue green deployment?_
 
 Well, they have quite a lot in common since maintaining two copies of the same environment leads to doubling the effort
-required to support it. That's why some teams, as Martin Fowler states, tend to perform a variation of that approach:
+required to support it. That's why some teams, as http://martinfowler.com/bliki/BlueGreenDeployment.html[Martin Fowler states it],
+tend to perform a variation of that approach:
 
 [quote]
 -----
