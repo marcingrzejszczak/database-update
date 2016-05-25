@@ -1,4 +1,4 @@
-=== Initial situation
+=== Step 1: Initial situation
 
 Version of the app: `1.0.0`
 

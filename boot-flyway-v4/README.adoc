@@ -1,4 +1,4 @@
-=== Removing last name from db
+=== Step 4: Removing last name from db
 
 Version of the app: `4.0.0`
 

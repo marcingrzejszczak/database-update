@@ -49,7 +49,7 @@ As you can if we do backwards incompatible changes of the DB and the application
 
 [source,bash]
 -----
-We will do it in the following way:
+Backwards incompatible scenario:
 
 01) Run 1.0.0
 02) Wait for the app (1.0.0) to boot

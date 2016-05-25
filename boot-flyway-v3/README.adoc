@@ -1,4 +1,4 @@
-=== Removing last name from code
+=== Step 3: Removing last name from code
 
 Version of the app: `3.0.0`
 

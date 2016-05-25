@@ -1,4 +1,4 @@
-=== Adding surname
+=== Step 2: Adding surname
 
 Version of the app: `2.0.0`
 
