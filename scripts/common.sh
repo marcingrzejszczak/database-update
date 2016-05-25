@@ -40,7 +40,7 @@ function java_jar() {
 
 # Kills an app with given $1 version
 function kill_app() {
-    echo -e "Killing app $1\n"
+    echo -e "\nKilling app $1\n"
     pkill -f "spring-boot-sample-flyway-$1-SNAPSHOT"
     return 0
 }

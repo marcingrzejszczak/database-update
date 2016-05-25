@@ -4,6 +4,14 @@ source common.sh || source scripts/common.sh || echo "No common.sh script found.
 
 set -e
 
+echo -e "Ensure that all the apps are built and H2 is running!\n"
+stop_h2
+clear_h2
+run_h2
+build_all_apps
+
+# APP 1.0.0 and 2.0.0
+
 cat <<EOF
 This Bash file will show you the scenario in which the app will be ran in version 1.0.0 and 2.0.0 simultaneously.
 We will do it in the following way:
@@ -27,14 +35,6 @@ We will do it in the following way:
 17) Generate a person by calling POST localhost:9994/person to version 4.0.0
 
 EOF
-
-echo -e "Ensure that all the apps are built and H2 is running!\n"
-stop_h2
-clear_h2
-run_h2
-build_all_apps
-
-# APP 1.0.0 and 2.0.0
 
 echo -e "\nStarting app in version 1.0.0\n"
 java_jar boot-flyway-v1 -Dspring.profiles.active=standalone

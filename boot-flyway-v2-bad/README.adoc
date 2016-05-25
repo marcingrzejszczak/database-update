@@ -40,6 +40,38 @@ Steps:
 
 As you can if we do backwards incompatible changes of the DB and the application, we can't roll back to a previous version.
 
+===== Logs from script execution
+
+[source,bash]
+-----
+We will do it in the following way:
+
+01) Run 1.0.0
+02) Wait for the app (1.0.0) to boot
+03) Generate a person by calling POST localhost:9991/person to version 1.0.0
+04) Run 2.0.0.BAD
+05) Wait for the app (2.0.0.BAD) to boot
+06) Generate a person by calling POST localhost:9991/person to version 1.0.0 <-- this should fail
+07) Generate a person by calling POST localhost:9992/person to version 2.0.0.BAD <-- this should pass
+
+Starting app in version 1.0.0
+Generate a person in version 1.0.0
+Sending a post to 127.0.0.1:9991/person. This is the response:
+
+{"firstName":"b73f639f-e176-4463-bf26-1135aace2f57","lastName":"b73f639f-e176-4463-bf26-1135aace2f57"}
+
+Starting app in version 2.0.0.BAD
+Generate a person in version 1.0.0
+Sending a post to 127.0.0.1:9991/person. This is the response:
+
+curl: (22) The requested URL returned error: 500 Internal Server Error
+
+Generate a person in version 2.0.0.BAD
+Sending a post to 127.0.0.1:9995/person. This is the response:
+
+{"firstName":"e156be2e-06b6-4730-9c43-6e14cfcda125","surname":"e156be2e-06b6-4730-9c43-6e14cfcda125"}
+-----
+
 ==== DB changes
 
 The migration script renames the column from `last_name` to `surname`
