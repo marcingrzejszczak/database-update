@@ -1,6 +1,112 @@
 = Database Update
 
-How to write the code of your app to allow doing A/B testing or/and continuous deployment.
+This article will define the issues related to code and database upgrades in order to perform zero downtime deployment.
+
+== Introduction
+
+=== Zero downtime deployment
+
+What is this mythical *zero downtime deployment*? You can say that your application is deployed that way if you can
+successfully introduce a new version of your application to production without making the user see that the application
+went down in the meantime. From the user's and the company's point of view it's the best possible scenario of deployment
+since new features can be introduced, bugs can be eliminated without any outage.
+
+How can you achieve that? There are number of ways but one of them is just to:
+
+- deploy version 1 of your service
+- migrate your database to a new version
+- deploy version 2 of your service in parallel to the version 1
+- once you see that version 2 works like a charm just bring down version 1
+- you're done!
+
+Easy, isn't it? Unfortunately it's not that easy and we'll focus on that later on. Right now let's check another
+common deployment process which is the blue green deployment.
+
+Have you ever heard of http://martinfowler.com/bliki/BlueGreenDeployment.html[blue green deployment]? With Cloud Foundry it's
+ extremely easy to do. Just check out https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments[this article] where
+ we describe it in more depth. To quickly recap:
+
+[quote]
+-----
+- maintain two copies of your production environment (“blue” and “green”);
+- route all traffic to the the blue environment by mapping production URLs to it;
+- deploy and test any changes to the application in the green environment;
+- “flip the switch” by mapping URLs onto green and unmapping them from blue.
+-----
+
+Blue green deployment is an approach that gives you ease of introducing new features without the stress that
+something will completely blow up on production. That's due to the fact that even if that would be the case,
+you can easily rollback your router to point to a previous environment just by "flipping the switch".
+
+After reading all of the above you could ask yourself a question: _What does zero downtime deployment have to do with Blue green deployment?_
+
+Well, they have quite a lot in common since maintaining two copies of the same environment leads to doubling the effort
+required to support it. That's why some teams, as Martin Fowler states, tend to perform a variation of that approach:
+
+[quote]
+-----
+Another variation would be to use the same database, making the blue-green switches for web and domain layers.
+
+Databases can often be a challenge with this technique, particularly when you need to change the schema to support a new version of the software.
+-----
+
+And here we arrive to the main problem that we will touch in this article. *The database*. Let's have another glimpse on this phrase:
+
+> migrate your database to a new version
+
+Now you should ask yourself a question - what if the database change is backwards incompatible? Won't my version 1 of the application
+ just blow up? Actually it will...
+
+So even though the benefits of zero downtime / blue green deployment are gigantic, companies tend to follow such a safer process
+ of deploying their apps:
+
+- prepare a package with the new version of the application
+- shut down the running application
+- run the database migration scripts
+- deploy and run the new version of the application
+
+In this article we'll describe in more depth how you can work with your database and your code so that you can profit from the
+benefits of the zero downtime deployment.
+
+=== The database changes
+
+If you have a stateless application that doesn't store any data in the database then you can start doing zero downtime deployment
+right now. Unfortunately most software has to store the data somewhere. That's why you have to think twice before doing any sort
+of schema changes. Before we go into the details of how to change the schema in such a way that zero downtime deployment is possible
+let's focus on schema versioning first.
+
+==== Schema versioning
+
+In this article we will use flywaydb.org[Flyway] as a schema versioning tool. Naturally we're also writing a Spring Boot application
+that has a native support for Flyway and will execute the schema migration upon application context setup. When using Flyway
+ you can store the migration scripts inside your projects folder (by default under `classpath:db/migration`). Here you can see an example
+ of such migration files
+
+[source,bash]
+------
+└── db
+ └── migration
+     ├── V1__init.sql
+     ├── V2__Add_surname.sql
+     ├── V3__Final_migration.sql
+     └── V4__Remove_lastname.sql
+------
+
+In this example we can see 4 migration scripts that, if not executed previously, will be executed one after another when the application
+starts. Let's take a look at one of the files as an example.
+
+[source,sql]
+-----
+include::../../../../boot-flyway-v4/src/main/resources/db/migration/V1__init.sql[]
+-----
+
+It's pretty self-explanatory: you can use SQL in order to define how your database should be changed. For more information about Spring Boot
+and Flyway http://docs.spring.io/spring-boot/docs/1.3.5.RELEASE/reference/html/howto-database-initialization.html#howto-execute-flyway-database-migrations-on-startup[check the Spring Boot Docs].
+
+Using a schema versioning tool with Spring Boot, you receive 2 great benefits.
+
+- you decouple database changes from the code
+- database migration happens together with your application deployment - your deployment process gets simplified
 
 == Scripts
 
@@ -123,3 +229,4 @@ so that you can review the state of the database (the default jdbc url is
 == Additional Reading
 
 - http://databaserefactoring.com[Database Refactoring patterns]
+- http://martinfowler.com/bliki/ContinuousDelivery.html[Continuous Delivery]
