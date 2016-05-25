@@ -1,4 +1,9 @@
-=== Adding surname
+=== Renaming a column in backwards-incompatible way
+
+Let's take a look at the following example if you want to change the column name:
+
+WARNING: The following example is deliberately done in such a way that it will break. We're showing it to depict the problem of database
+compatibility.
 
 Version of the app: `2.0.0.BAD`
 
