@@ -4,10 +4,10 @@
 
 {repo_url}
 
-This article will explain in more depth how to tackle issues related to database compatibility with Spring Boot and
-database versioning tooling. We will present what can happen with your production applications if you try to perform
-such a deployment unprepared. We will also walk through the lifecycle of an application in order to perform zero
-downtime deployment and at the end of day apply a backwards incompatible database change in a backwards compatible way.
+This article will explain in depth how to tackle issues related to database compatibility and the deployment process.
+We will present what can happen with your production applications if you try to perform
+such a deployment unprepared. We will then wall through the steps in the lifecycle of an application that are necessary
+in order to have zero downtime. The result of our operations will be applying a backwards incompatible database change in a backwards compatible way.
 
 == Introduction
 
