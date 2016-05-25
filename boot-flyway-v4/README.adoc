@@ -2,7 +2,7 @@
 
 Version of the app: `4.0.0`
 
-Version of the DB: `v3`
+Version of the DB: `v4`
 
 ==== Comment
 
