@@ -1,6 +1,9 @@
-= Database Update
+= Zero Downtime Deployment Database Issues
 
-This article will define the issues related to code and database upgrades in order to perform zero downtime deployment.
+This article will explain in more depth how to tackle issues related to database compatibility with Spring Boot and
+database versioning tooling. We will present what can happen with your production applications if you try to perform
+such a deployment unprepared. We will also walk through the lifecycle of an application in order to perform zero
+downtime deployment and at the end of day apply a backwards incompatible database change in a backwards compatible way.
 
 == Introduction
 
