@@ -34,12 +34,12 @@ Have you ever heard of http://martinfowler.com/bliki/BlueGreenDeployment.html[bl
  we describe it in more depth. To quickly recap, doing blue green deployment is as simple as:
 
 [quote]
------
+____
 - maintain two copies of your production environment (“blue” and “green”);
 - route all traffic to the the blue environment by mapping production URLs to it;
 - deploy and test any changes to the application in the green environment;
 - “flip the switch” by mapping URLs onto green and unmapping them from blue.
------
+____
 
 Blue green deployment is an approach that gives you ease of introducing new features without the stress that
 something will completely blow up on production. That's due to the fact that even if that would be the case,
@@ -52,11 +52,11 @@ required to support it. That's why some teams, as http://martinfowler.com/bliki/
 tend to perform a variation of that approach:
 
 [quote]
------
+____
 Another variation would be to use the same database, making the blue-green switches for web and domain layers.
 
 Databases can often be a challenge with this technique, particularly when you need to change the schema to support a new version of the software.
------
+____
 
 And here we arrive to the main problem that we will touch in this article. *The database*. Let's have another glimpse on this phrase:
 
